@@ -263,17 +263,16 @@ mxHierarchicalLayout.prototype.execute = function(parent, roots)
 
 		this.roots = rootsCopy;
 	}
-	
 	model.beginUpdate();
 	try
 	{
 		this.run(parent);
-		
+
 		if (this.resizeParent && !this.graph.isCellCollapsed(parent))
 		{
 			this.graph.updateGroupBounds([parent], this.parentBorder, this.moveParent);
 		}
-		
+
 		// Maintaining parent location
 		if (this.parentX != null && this.parentY != null)
 		{

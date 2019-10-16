@@ -51,7 +51,7 @@ public class GraphEditor
 		server.setHandler(handlers);
 
 		System.out.println("Go to http://localhost:" + PORT + "/javascript/examples/grapheditor/www/index.html");
-		
+
 		server.start();
 		server.join();
 	}

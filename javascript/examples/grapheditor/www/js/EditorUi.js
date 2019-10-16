@@ -69,8 +69,8 @@ EditorUi = function(editor, container, lightbox)
 	// Disables text selection while not editing and no dialog visible
 	if (this.container == document.body)
 	{
-		this.menubarContainer.onselectstart = textEditing;
-		this.menubarContainer.onmousedown = textEditing;
+		// this.menubarContainer.onselectstart = textEditing;
+		// this.menubarContainer.onmousedown = textEditing;
 		this.toolbarContainer.onselectstart = textEditing;
 		this.toolbarContainer.onmousedown = textEditing;
 		this.diagramContainer.onselectstart = textEditing;
@@ -79,6 +79,8 @@ EditorUi = function(editor, container, lightbox)
 		this.sidebarContainer.onmousedown = textEditing;
 		this.formatContainer.onselectstart = textEditing;
 		this.formatContainer.onmousedown = textEditing;
+		this.resourceListContainer.onselectstart = textEditing;
+		this.resourceListContainer.onmousedown = textEditing;
 		this.footerContainer.onselectstart = textEditing;
 		this.footerContainer.onmousedown = textEditing;
 		
@@ -258,9 +260,10 @@ EditorUi = function(editor, container, lightbox)
 			// Saves references to special items
 			var tmp1 = this.toolbar.fontMenu;
 			var tmp2 = this.toolbar.sizeMenu;
-			
+
 			if (nodes == null)
 			{
+				console.log("doubleclick");
 				this.toolbar.createTextToolbar();
 			}
 			else
@@ -294,7 +297,10 @@ EditorUi = function(editor, container, lightbox)
 		if (graph.cellEditor.isContentEditing())
 		{
 			var updating = false;
-			
+
+			console.log("수정시작");
+			ui.sidebar.sidebarResize(arguments);
+
 			var updateCssHandler = function()
 			{
 				if (!updating)
@@ -340,7 +346,7 @@ EditorUi = function(editor, container, lightbox)
 				}
 			};
 			
-			mxEvent.addListener(graph.cellEditor.textarea, 'input', updateCssHandler)
+			mxEvent.addListener(graph.cellEditor.textarea, 'input', updateCssHandler);
 			mxEvent.addListener(graph.cellEditor.textarea, 'touchend', updateCssHandler);
 			mxEvent.addListener(graph.cellEditor.textarea, 'mouseup', updateCssHandler);
 			mxEvent.addListener(graph.cellEditor.textarea, 'keyup', updateCssHandler);
@@ -353,6 +359,11 @@ EditorUi = function(editor, container, lightbox)
 	{
 		cellEditorStopEditing.apply(this, arguments);
 		updateToolbar();
+
+		console.log("수정끝");
+		ui.sidebar.sidebarResize(null);
+
+		//todo : Stencil 영역 넓히는 펑션추가
 	};
 	
     // Enables scrollbars and sets cursor style for the container
@@ -426,7 +437,7 @@ EditorUi = function(editor, container, lightbox)
 			{
 				// Ignores default styles
 				var clone = cell.clone();
-				clone.style = ''
+				clone.style = '';
 				var defaultStyle = graph.getCellStyle(clone);
 				var values = [];
 				var keys = [];
@@ -885,7 +896,9 @@ EditorUi = function(editor, container, lightbox)
    		{
    			if (this.editor.graph != null)
    			{
-   				this.refresh();
+   				console.log("데헷");
+   				// this.refresh();
+   				this.bhResize();
    			}
    		}), 0);
    	});
@@ -962,10 +975,16 @@ EditorUi.compactUi = true;
  */
 EditorUi.prototype.splitSize = (mxClient.IS_TOUCH || mxClient.IS_POINTER) ? 12 : 8;
 
+
+/**
+ * Specifies the height of the titlebar. Default is 50.
+ */
+EditorUi.prototype.titlebarHeight = 55;
+
 /**
  * Specifies the height of the menubar. Default is 34.
  */
-EditorUi.prototype.menubarHeight = 30;
+EditorUi.prototype.menubarHeight = 0;
 
 /**
  * Specifies the width of the format panel should be enabled. Default is true.
@@ -975,7 +994,13 @@ EditorUi.prototype.formatEnabled = true;
 /**
  * Specifies the width of the format panel. Default is 240.
  */
-EditorUi.prototype.formatWidth = 240;
+EditorUi.prototype.formatWidth = 0;
+
+/**
+ * Specifies the width of the format panel. Default is 240.
+ */
+// EditorUi.prototype.resourceListWidth = 240;
+EditorUi.prototype.resourceListWidth = 0;
 
 /**
  * Specifies the height of the toolbar. Default is 40.
@@ -996,7 +1021,7 @@ EditorUi.prototype.sidebarFooterHeight = 34;
  * Specifies the position of the horizontal split bar. Default is 240 or 118 for
  * screen widths <= 640px.
  */
-EditorUi.prototype.hsplitPosition = (screen.width <= 640) ? 118 : 240;
+EditorUi.prototype.hsplitPosition = (screen.width <= 640) ? 118 : 350;
 
 /**
  * Specifies if animations are allowed in <executeLayout>. Default is true.
@@ -1072,6 +1097,12 @@ EditorUi.prototype.init = function()
 	{
 		this.format.init();
 	}
+
+	if (this.resourceList != null) {
+		this.resourceList.init();
+	}
+
+
 };
 
 /**
@@ -2866,7 +2897,8 @@ EditorUi.prototype.updateActionStates = function()
 	               'editStyle', 'editTooltip', 'editLink', 'backgroundColor', 'borderColor',
 	               'edit', 'toFront', 'toBack', 'lockUnlock', 'solid', 'dashed', 'pasteSize',
 	               'dotted', 'fillColor', 'gradientColor', 'shadow', 'fontColor',
-	               'formattedText', 'rounded', 'toggleRounded', 'sharp', 'strokeColor'];
+	               'formattedText', 'rounded', 'toggleRounded', 'sharp', 'strokeColor',
+				   ];
 	
 	for (var i = 0; i < actions.length; i++)
 	{
@@ -2921,13 +2953,160 @@ EditorUi.prototype.updateActionStates = function()
     this.updatePasteActionStates();
 };
 
+
+/**
+ * Resize the viewPort.
+ * by bhkim
+ */
+EditorUi.prototype.bhResize = function () {
+	console.log(arguments);
+	var allWidth = window.outerWidth -16 ;
+
+	// this.formatContainer.firstChild.firstChild.lastChild.click();
+// .formatContainer.style.transition="none"
+
+	var standardWidth = (allWidth*0.2);
+	var hsplitWidth = this.hsplit.style.width;
+
+	console.log(standardWidth);
+
+	if ( standardWidth < 240 ) {
+		// if ( this.formatContainer.style.width != "0px" ) {
+		// 	this.formatContainer.style.width = "0px";
+		// 	this.formatContainer.firstChild.firstChild.lastChild.click();
+		// 	this.diagramContainer.style.right = "0px"
+		// }
+
+		//updated target list is
+
+
+		if ( standardWidth < 200 ) {
+			//1 : 사이드바
+			this.sidebarContainer.style.width = "0%";
+			//2 : 사이드바 조정 핸들
+			this.hsplit.style.right = "1%";
+
+			//3 : Editor 패널
+			this.diagramContainer.style.right = "1%";
+		} else {
+			//1 : 사이드바
+			this.sidebarContainer.style.width = standardWidth + "px";
+			//2 : 사이드바 조정 핸들
+			this.hsplit.style.right = standardWidth + "px";
+
+			//3 : Editor 패널
+			this.diagramContainer.style.right = "18.5%";
+		}
+
+		console.log("헿 : "+standardWidth );
+		console.log(this.diagramContainer.style.right);
+
+	} else {
+		//updated target list is
+		//1 : 사이드바
+		this.sidebarContainer.style.width = standardWidth + "px";
+
+		//2 : 사이드바 조정 핸들
+		this.hsplit.style.right = standardWidth + "px";
+
+		//3 : Editor 패널
+		// this.diagramContainer.style.left = "20.5%";
+
+		console.log("힁 : "+standardWidth);
+		// console.log(this.diagramContainer.style.left);
+		// this.diagramContainer.style.right = standardWidth + "px";
+
+		//4 : Format 탭
+		// this.formatContainer.style.width = standardWidth + "px";
+	}
+
+
+	if ( standardWidth <= 300 ) {
+		//todo : standard Width가 줄어듬에 따라
+		//Card의 크기를 동기화한다.
+		//290이면 100%
+		//280이면 90%
+		//270이면 80%
+		//260이면 70%
+		//250이면 60%
+		//240이면 50%
+		//230이면 40%
+		//220이면 30%
+		//210이면 20%
+		//200이면 10%
+		//190이면 0%
+		var cardPoint = { x : 232, y : 300 };
+		var cardUlPoint = { x : 230, y : 270 };
+		var cardImgPoint = { x : 223, y : 265 };
+		var card = this.sidebarContainer.getElementsByClassName("geSidebarTemplate")[0].firstElementChild;
+		var cardUl = card.firstElementChild;
+		var cardImg = cardUl.firstElementChild;
+		var palette = this.sidebarContainer.getElementsByClassName("geSidebarTemplate")[0];
+
+		var diff = ( 100 - ( (300 - standardWidth ) * 0.5 ) ) * 0.01;
+		console.log(card);
+		console.log(cardPoint);
+		console.log(diff);
+
+		palette.style.paddingLeft = 25 * diff + "px";
+
+		card.style.width = cardPoint.x * diff + "px";
+		card.style.height = cardPoint.y * diff + "px";
+		cardUl.style.width = cardUlPoint.x * diff + "px";
+		cardUl.style.height = cardUlPoint.y * diff + "px";
+		cardImg.style.width = cardImgPoint.x * diff + "px";
+		cardImg.style.height = cardImgPoint.y * diff + "px";
+
+		var card2 = this.sidebarContainer.getElementsByClassName("geSidebarTemplate")[0].lastElementChild;
+		var cardUl2 = card2.firstElementChild;
+		var cardImg2 = cardUl2.firstElementChild;
+
+		card2.style.width = cardPoint.x * diff + "px";
+		card2.style.height = cardPoint.y * diff + "px";
+		cardUl2.style.width = cardUlPoint.x * diff + "px";
+		cardUl2.style.height = cardUlPoint.y * diff + "px";
+		cardImg2.style.width = cardImgPoint.x * diff + "px";
+		cardImg2.style.height = cardImgPoint.y * diff + "px";
+	} else {
+
+		diff = 1;
+
+		var cardPoint = { x : 232, y : 300 };
+		var cardUlPoint = { x : 230, y : 270 };
+		var cardImgPoint = { x : 223, y : 265 };
+		var card = this.sidebarContainer.getElementsByClassName("geSidebarTemplate")[0].firstElementChild;
+		var cardUl = card.firstElementChild;
+		var cardImg = cardUl.firstElementChild;
+		var card2 = this.sidebarContainer.getElementsByClassName("geSidebarTemplate")[0].lastElementChild;
+		var cardUl2 = card2.firstElementChild;
+		var cardImg2 = cardUl2.firstElementChild;
+
+		this.sidebarContainer.getElementsByClassName("geSidebarTemplate")[0].style.paddingLeft = "25px";
+
+		card.style.width = cardPoint.x * diff + "px";
+		card.style.height = cardPoint.y * diff + "px";
+		cardUl.style.width = cardUlPoint.x * diff + "px";
+		cardUl.style.height = cardUlPoint.y * diff + "px";
+		cardImg.style.width = cardImgPoint.x * diff + "px";
+		cardImg.style.height = cardImgPoint.y * diff + "px";
+
+		card2.style.width = cardPoint.x * diff + "px";
+		card2.style.height = cardPoint.y * diff + "px";
+		cardUl2.style.width = cardUlPoint.x * diff + "px";
+		cardUl2.style.height = cardUlPoint.y * diff + "px";
+		cardImg2.style.width = cardImgPoint.x * diff + "px";
+		cardImg2.style.height = cardImgPoint.y * diff + "px";
+	}
+};
+
+
 /**
  * Refreshes the viewport.
  */
 EditorUi.prototype.refresh = function(sizeDidChange)
 {
 	sizeDidChange = (sizeDidChange != null) ? sizeDidChange : true;
-	
+
 	var quirks = mxClient.IS_IE && (document.documentMode == null || document.documentMode == 5);
 	var w = this.container.clientWidth;
 	var h = this.container.clientHeight;
@@ -2937,12 +3116,12 @@ EditorUi.prototype.refresh = function(sizeDidChange)
 		w = document.body.clientWidth || document.documentElement.clientWidth;
 		h = (quirks) ? document.body.clientHeight || document.documentElement.clientHeight : document.documentElement.clientHeight;
 	}
-	
+
 	// Workaround for bug on iOS see
 	// http://stackoverflow.com/questions/19012135/ios-7-ipad-safari-landscape-innerheight-outerheight-layout-issue
 	// FIXME: Fix if footer visible
 	var off = 0;
-	
+
 	if (mxClient.IS_IOS && !window.navigator.standalone)
 	{
 		if (window.innerHeight != document.documentElement.clientHeight)
@@ -2951,30 +3130,36 @@ EditorUi.prototype.refresh = function(sizeDidChange)
 			window.scrollTo(0, 0);
 		}
 	}
-	
+
 	var effHsplitPosition = Math.max(0, Math.min(this.hsplitPosition, w - this.splitSize - 20));
 	var tmp = 0;
-	
+
+	if ( this.titlebar != null ) {
+		this.titlebarContainer.style.height = this.titlebarHeight + 'px';
+		tmp += this.titlebarHeight;
+	}
+
 	if (this.menubar != null)
 	{
+		this.menubarContainer.style.top = tmp + 'px';
 		this.menubarContainer.style.height = this.menubarHeight + 'px';
 		tmp += this.menubarHeight;
 	}
-	
+
 	if (this.toolbar != null)
 	{
-		this.toolbarContainer.style.top = this.menubarHeight + 'px';
+		this.toolbarContainer.style.top = tmp + 'px';
 		this.toolbarContainer.style.height = this.toolbarHeight + 'px';
 		tmp += this.toolbarHeight;
 	}
-	
+
 	if (tmp > 0 && !mxClient.IS_QUIRKS)
 	{
 		tmp += 1;
 	}
-	
+
 	var sidebarFooterHeight = 0;
-	
+
 	if (this.sidebarFooterContainer != null)
 	{
 		var bottom = this.footerHeight + off;
@@ -2983,27 +3168,42 @@ EditorUi.prototype.refresh = function(sizeDidChange)
 		this.sidebarFooterContainer.style.height = sidebarFooterHeight + 'px';
 		this.sidebarFooterContainer.style.bottom = bottom + 'px';
 	}
-	
-	var fw = (this.format != null) ? this.formatWidth : 0;
+
+	var sum = 0;
+	if (this.format != null) {
+		sum = sum + this.formatWidth;
+	}
+
+	if (this.resourceList != null) {
+		sum = sum + this.resourceListWidth;
+	}
+
+	var fw = sum;
 	this.sidebarContainer.style.top = tmp + 'px';
 	this.sidebarContainer.style.width = effHsplitPosition + 'px';
+
 	this.formatContainer.style.top = tmp + 'px';
-	this.formatContainer.style.width = fw + 'px';
+	this.formatContainer.style.width = this.formatWidth + 'px';
 	this.formatContainer.style.display = (this.format != null) ? '' : 'none';
-	
-	this.diagramContainer.style.left = (this.hsplit.parentNode != null) ? (effHsplitPosition + this.splitSize) + 'px' : '0px';
+	this.resourceListContainer.style.top = tmp + 'px';
+	this.resourceListContainer.style.width = this.resourceListWidth + 'px';
+	this.resourceListContainer.style.display = (this.resourceList != null) ? '' : 'none';
+
+	this.diagramContainer.style.left = '0px';
+	this.diagramContainer.style.right = (this.hsplit.parentNode != null) ? (effHsplitPosition + this.splitSize) + 'px' : '0px';
+
 	this.diagramContainer.style.top = this.sidebarContainer.style.top;
 	this.footerContainer.style.height = this.footerHeight + 'px';
 	this.hsplit.style.top = this.sidebarContainer.style.top;
 	this.hsplit.style.bottom = (this.footerHeight + off) + 'px';
-	this.hsplit.style.left = effHsplitPosition + 'px';
+	this.hsplit.style.right = effHsplitPosition + 'px';
 	this.footerContainer.style.display = (this.footerHeight == 0) ? 'none' : '';
-	
+
 	if (this.tabContainer != null)
 	{
-		this.tabContainer.style.left = this.diagramContainer.style.left;
+		// this.tabContainer.style.left = this.diagramContainer.style.left;
 	}
-	
+
 	if (quirks)
 	{
 		this.menubarContainer.style.width = w + 'px';
@@ -3011,17 +3211,18 @@ EditorUi.prototype.refresh = function(sizeDidChange)
 		var sidebarHeight = Math.max(0, h - this.footerHeight - this.menubarHeight - this.toolbarHeight);
 		this.sidebarContainer.style.height = (sidebarHeight - sidebarFooterHeight) + 'px';
 		this.formatContainer.style.height = sidebarHeight + 'px';
+		this.resourceListContainer.style.height = sidebarHeight + 'px';
 		this.diagramContainer.style.width = (this.hsplit.parentNode != null) ? Math.max(0, w - effHsplitPosition - this.splitSize - fw) + 'px' : w + 'px';
 		this.footerContainer.style.width = this.menubarContainer.style.width;
 		var diagramHeight = Math.max(0, h - this.footerHeight - this.menubarHeight - this.toolbarHeight);
-		
+
 		if (this.tabContainer != null)
 		{
-			this.tabContainer.style.width = this.diagramContainer.style.width;
+			// this.tabContainer.style.width = this.diagramContainer.style.width;
 			this.tabContainer.style.bottom = (this.footerHeight + off) + 'px';
 			diagramHeight -= this.tabContainer.clientHeight;
 		}
-		
+
 		this.diagramContainer.style.height = diagramHeight + 'px';
 		this.hsplit.style.height = diagramHeight + 'px';
 	}
@@ -3031,22 +3232,23 @@ EditorUi.prototype.refresh = function(sizeDidChange)
 		{
 			this.footerContainer.style.bottom = off + 'px';
 		}
-		
-		this.diagramContainer.style.right = fw + 'px';
+
+		// this.diagramContainer.style.right = fw + 'px';
 		var th = 0;
-		
+
 		if (this.tabContainer != null)
 		{
 			this.tabContainer.style.bottom = (this.footerHeight + off) + 'px';
 			this.tabContainer.style.right = this.diagramContainer.style.right;
 			th = this.tabContainer.clientHeight;
 		}
-		
-		this.sidebarContainer.style.bottom = (this.footerHeight + sidebarFooterHeight + off) + 'px';
+
+		// this.sidebarContainer.style.bottom = (this.footerHeight + sidebarFooterHeight + off) + 'px';
 		this.formatContainer.style.bottom = (this.footerHeight + off) + 'px';
+		this.resourceListContainer.style.bottom = (this.footerHeight + off) + 'px';
 		this.diagramContainer.style.bottom = (this.footerHeight + off + th) + 'px';
 	}
-	
+
 	if (sizeDidChange)
 	{
 		this.editor.graph.sizeDidChange();
@@ -3066,24 +3268,36 @@ EditorUi.prototype.createTabContainer = function()
  */
 EditorUi.prototype.createDivs = function()
 {
+	this.titlebarContainer = this.createDiv('geTitlebarContainer');
 	this.menubarContainer = this.createDiv('geMenubarContainer');
 	this.toolbarContainer = this.createDiv('geToolbarContainer');
 	this.sidebarContainer = this.createDiv('geSidebarContainer');
 	this.formatContainer = this.createDiv('geSidebarContainer geFormatContainer');
+	this.cellParamListContainer = this.createDiv('geSidebarContainer geCellParamListContainer');
+	this.resourceListContainer = this.createDiv('geSidebarContainer geResourceListContainer');
 	this.diagramContainer = this.createDiv('geDiagramContainer');
 	this.footerContainer = this.createDiv('geFooterContainer');
 	this.hsplit = this.createDiv('geHsplit');
 	this.hsplit.setAttribute('title', mxResources.get('collapseExpand'));
 
 	// Sets static style for containers
+	this.titlebarContainer.style.top = '0px';
+	this.titlebarContainer.style.left = '0px';
+	this.titlebarContainer.style.right = '0px';
 	this.menubarContainer.style.top = '0px';
 	this.menubarContainer.style.left = '0px';
 	this.menubarContainer.style.right = '0px';
 	this.toolbarContainer.style.left = '0px';
 	this.toolbarContainer.style.right = '0px';
-	this.sidebarContainer.style.left = '0px';
-	this.formatContainer.style.right = '0px';
+	// this.sidebarContainer.style.left = '0px';
+	this.sidebarContainer.style.right = '0px';
+	this.sidebarContainer.style.zIndex = '1';
+	this.formatContainer.style.right = this.resourceListWidth + 'px';
 	this.formatContainer.style.zIndex = '1';
+	this.cellParamListContainer.style.right = '0px';
+	this.cellParamListContainer.style.zIndex = '1';
+	this.resourceListContainer.style.right = '0px';
+	this.resourceListContainer.style.zIndex = '1';
 	this.diagramContainer.style.right = ((this.format != null) ? this.formatWidth : 0) + 'px';
 	this.footerContainer.style.left = '0px';
 	this.footerContainer.style.right = '0px';
@@ -3120,6 +3334,17 @@ EditorUi.prototype.createSidebarFooterContainer = function()
  */
 EditorUi.prototype.createUi = function()
 {
+
+	var div = document.createElement('div');
+	this.titlebarContainer.className = "geheaderTitle";
+	var h1 = document.createElement("h1");
+	h1.innerHTML = "Work Bench > Sample";
+	this.titlebarContainer.appendChild(h1);
+
+	this.titlebar = this.titlebarContainer;
+	this.container.appendChild(this.titlebarContainer);
+
+
 	// Creates menubar
 	this.menubar = (this.editor.chromeless) ? null : this.menus.createMenubar(this.createDiv('geMenubar'));
 	
@@ -3160,7 +3385,19 @@ EditorUi.prototype.createUi = function()
 	if (this.format != null)
 	{
 		this.container.appendChild(this.formatContainer);
+		this.toggleFormatPanel(true);
 	}
+
+	// Creates the format sidebar
+	// this.resourceList = (this.editor.chromeless ) ? null : this.createResourceList(this.resourceListContainer);
+	//
+	// if (this.resourceList != null)
+	// {
+	// 	this.container.appendChild(this.resourceListContainer);
+	// }
+
+
+	this.cellParamList = (this.editor.chrmeless) ? null : this.createCellParamList(this.cellParamListContainer);
 	
 	// Creates the footer
 	var footer = (this.editor.chromeless) ? null : this.createFooter();
@@ -3254,6 +3491,15 @@ EditorUi.prototype.createFormat = function(container)
 	return new Format(this, container);
 };
 
+EditorUi.prototype.createResourceList = function(container) {
+	return new ResourceList(this, container);
+};
+
+EditorUi.prototype.createCellParamList = function (container)
+{
+	return new CellParamList(this, container);
+};
+
 /**
  * Creates and returns a new footer.
  */
@@ -3279,10 +3525,9 @@ EditorUi.prototype.createDiv = function(classname)
 EditorUi.prototype.addSplitHandler = function(elt, horizontal, dx, onChange)
 {
 	var start = null;
-	var initial = null;
 	var ignoreClick = true;
 	var last = null;
-
+	var container = this.container;
 	// Disables built-in pan and zoom in IE10 and later
 	if (mxClient.IS_POINTER)
 	{
@@ -3307,7 +3552,7 @@ EditorUi.prototype.addSplitHandler = function(elt, horizontal, dx, onChange)
 		if (start != null)
 		{
 			var pt = new mxPoint(mxEvent.getClientX(evt), mxEvent.getClientY(evt));
-			onChange(Math.max(0, initial + ((horizontal) ? (pt.x - start.x) : (start.y - pt.y)) - dx));
+			onChange( Math.max(0, ((horizontal) ? (container.clientWidth - pt.x) : (container.clientHeight - pt.y)) - dx) );
 			mxEvent.consume(evt);
 			
 			if (initial != getValue())
@@ -4330,9 +4575,9 @@ EditorUi.prototype.destroy = function()
 		this.destroyFunctions = null;
 	}
 	
-	var c = [this.menubarContainer, this.toolbarContainer, this.sidebarContainer,
-	         this.formatContainer, this.diagramContainer, this.footerContainer,
-	         this.chromelessToolbar, this.hsplit, this.sidebarFooterContainer,
+	var c = [this.titlebarContainer, this.menubarContainer, this.toolbarContainer, this.sidebarContainer,
+	         this.formatContainer, this.cellParamListContainer, this.diagramContainer, this.footerContainer,
+	         this.resourceListContainer, this.chromelessToolbar, this.hsplit, this.sidebarFooterContainer,
 	         this.layersDialog];
 	
 	for (var i = 0; i < c.length; i++)

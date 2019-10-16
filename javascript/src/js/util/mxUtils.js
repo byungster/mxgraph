@@ -3340,6 +3340,10 @@ var mxUtils =
 	 */
 	setCellStyles: function(model, cells, key, value)
 	{
+		console.log(model);
+		console.log(cells);
+		console.log(key);
+		console.log(value);
 		if (cells != null && cells.length > 0)
 		{
 			model.beginUpdate();
@@ -4320,7 +4324,7 @@ var mxUtils =
 	 * preview.
 	 * autoscroll - Optional boolean that specifies if autoscroll should be
 	 * used. Default is mxGraph.autoscroll.
-	 * scalePreview - Optional boolean that specifies if the preview element
+	 * scalaaaePreview - Optional boolean that specifies if the preview element
 	 * should be scaled according to the graph scale. If this is true, then
 	 * the offsets will also be scaled. Default is false.
 	 * highlightDropTargets - Optional boolean that specifies if dropTargets
@@ -4338,7 +4342,7 @@ var mxUtils =
 		
 		// Cannot enable this by default. This needs to be enabled in the caller
 		// if the funct argument uses the new x- and y-arguments.
-		dragSource.setGuidesEnabled(false);
+		dragSource.setGuidesEnabled(true);
 		
 		if (highlightDropTargets != null)
 		{
@@ -4364,7 +4368,7 @@ var mxUtils =
 			{
 				return dragElement.cloneNode(true);
 			};
-			
+
 			if (scalePreview)
 			{
 				dragSource.createPreviewElement = function(graph)
@@ -4375,7 +4379,7 @@ var mxUtils =
 					var h = parseInt(elt.style.height);
 					elt.style.width = Math.round(w * graph.view.scale) + 'px';
 					elt.style.height = Math.round(h * graph.view.scale) + 'px';
-					
+
 					return elt;
 				};
 			}

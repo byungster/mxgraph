@@ -4663,7 +4663,7 @@ mxGraph.prototype.cellsAdded = function(cells, parent, index, source, target, ab
 						var oldState = this.view.getState(previous);
 						var o2 = (oldState != null) ? oldState.origin : zero;
 						var geo = this.model.getGeometry(cells[i]);
-	
+
 						if (geo != null)
 						{
 							var dx = o2.x - o1.x;
@@ -9237,6 +9237,13 @@ mxGraph.prototype.isSwimlane = function (cell)
 
 			if (style != null && !this.model.isEdge(cell))
 			{
+			    if ( style[mxConstants.STYLE_SHAPE] == mxConstants.SHAPE_SWIMLANE ) {
+                    // console.log("스타일!!");
+                    // console.log(mxConstants.STYLE_SHAPE);
+                    // console.log(style[mxConstants.STYLE_SHAPE]);
+                    // console.log(mxConstants.SHAPE_SWIMLANE);
+                }
+
 				return style[mxConstants.STYLE_SHAPE] == mxConstants.SHAPE_SWIMLANE;
 			}
 		}

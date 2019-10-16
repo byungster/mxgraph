@@ -625,7 +625,7 @@ mxGraphModel.prototype.add = function(parent, child, index)
 		{
 			index = this.getChildCount(parent);
 		}
-		
+
 		var parentChanged = parent != this.getParent(child);
 		this.execute(new mxChildChange(this, parent, child, index));
 

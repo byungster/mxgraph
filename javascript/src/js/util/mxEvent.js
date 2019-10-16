@@ -37,6 +37,8 @@ var mxEvent =
 			var entry = {name: eventName, f: funct};
 			element.mxListenerList.push(entry);
 		};
+
+
 		
 		if (window.addEventListener)
 		{

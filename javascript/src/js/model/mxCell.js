@@ -272,6 +272,8 @@ mxCell.prototype.setGeometry = function(geometry)
  */
 mxCell.prototype.getStyle = function()
 {
+	// console.trace();
+
 	return this.style;
 };
 

@@ -46,6 +46,7 @@ Actions.prototype.init = function()
 		
 		window.openFile.setConsumer(mxUtils.bind(this, function(xml, filename)
 		{
+			console.log(xml);
 			try
 			{
 				var doc = mxUtils.parseXml(xml);
@@ -1299,9 +1300,31 @@ Actions.prototype.init = function()
 			this.outlineWindow.window.setVisible(!this.outlineWindow.window.isVisible());
 		}
 	}), null, null, Editor.ctrlKey + '+Shift+O');
-	
+
 	action.setToggleAction(true);
 	action.setSelectedCallback(mxUtils.bind(this, function() { return this.outlineWindow != null && this.outlineWindow.window.isVisible(); }));
+
+	action = this.addAction('cellSortVertical', mxUtils.bind(this, function() {
+		var layout = new mxHierarchicalLayout(graph, mxConstants.DIRECTION_NORTH);
+
+		this.editorUi.executeLayout(function(){
+			layout.execute(graph.getDefaultParent());
+		}, true);
+
+	}), null, null, Editor.ctrlKey + '+q');
+	action.setEnabled(true);
+
+
+	action = this.addAction('cellSortHorizontal', mxUtils.bind(this, function() {
+		var layout = new mxHierarchicalLayout(graph, mxConstants.DIRECTION_WEST);
+
+		this.editorUi.executeLayout(function(){
+			layout.execute(graph.getDefaultParent());
+		}, true);
+
+	}), null, null, Editor.ctrlKey + '+q');
+	action.setEnabled(true);
+
 };
 
 /**

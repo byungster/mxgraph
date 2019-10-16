@@ -8,11 +8,24 @@ function Sidebar(editorUi, container)
 {
 	this.editorUi = editorUi;
 	this.container = container;
+
+	this.stencilContainer = document.createElement('div');
+	this.stencilContainer.className = "geStencilContainer";
+	this.featureContainer = document.createElement('div');
+	this.featureContainer.className = "geSidebarFeature";
+	this.compositeContainer = document.createElement('div');
+	this.compositeContainer.className = "geSidebarComposite";
+	this.templatesContainer = document.createElement('div');
+	this.templatesContainer.className = "geSidebarTemplate";
+
+	this.propertyContainer = document.createElement('div');
+	this.propertyContainer.className = "gePropertyContainer";
+
 	this.palettes = new Object();
 	this.taglist = new Object();
 	this.showTooltips = true;
 	this.graph = editorUi.createTemporaryGraph(this.editorUi.editor.graph.getStylesheet());
-    this.graph.cellRenderer.minSvgStrokeWidth = this.minThumbStrokeWidth;
+	this.graph.cellRenderer.minSvgStrokeWidth = this.minThumbStrokeWidth;
 	this.graph.cellRenderer.antiAlias = this.thumbAntiAlias;
 	this.graph.container.style.visibility = 'hidden';
 	this.graph.foldingEnabled = false;
@@ -80,9 +93,19 @@ function Sidebar(editorUi, container)
 Sidebar.prototype.init = function()
 {
 	var dir = STENCIL_PATH;
-	
+	var dir2 = TEMPLATE_PATH;
+
+	this.addSectionTab();
+
+	this.addTabPalette(true, this.featureContainer, this.templatesContainer );
+
+	//feature container를 생성한다.
 	this.addSearchPalette(true);
-	this.addGeneralPalette(true);
+	this.addStartPalette(true);
+	this.addProcessPalette(true);
+	this.addActionPalette(true);
+
+	this.addGeneralPalette(false);
 	this.addMiscPalette(false);
 	this.addAdvancedPalette(false);
 	this.addBasicPalette(dir);
@@ -100,6 +123,24 @@ Sidebar.prototype.init = function()
 		 'Worker1', 'Soldier1', 'Doctor1', 'Tech1', 'Security1', 'Telesales1'], null,
 		 {'Wireless_Router_N': 'wireless router switch wap wifi access point wlan',
 		  'Router_Icon': 'router switch'});
+
+	this.stencilContainer.appendChild(this.featureContainer);
+
+	//composite Container를 생성한다.
+	this.addCompositeContainer(false);
+
+	//Template Container를 생성한다.
+	this.addTemplateContainer(dir2, false);
+	this.templatesContainer.style.display = 'none';
+	this.stencilContainer.appendChild(this.templatesContainer);
+
+	this.container.appendChild(this.stencilContainer);
+
+	//Property Container를 생성한다.
+	this.createPropertyContainer();
+	this.container.appendChild(this.propertyContainer);
+
+	this.sidebarResize(null);
 };
 
 /**
@@ -146,6 +187,21 @@ Sidebar.prototype.dropTargetDelay = 200;
  * Specifies the URL of the gear image.
  */
 Sidebar.prototype.gearImage = STENCIL_PATH + '/clipart/Gear_128x128.png';
+
+Sidebar.prototype.onlineSignupImage = STENCIL_PATH + '/clipart/acOnlineSignup_40x40.png';
+Sidebar.prototype.questionImage = STENCIL_PATH + '/clipart/acQuestion_40x40.png';
+Sidebar.prototype.inboundMessageImage = STENCIL_PATH + '/clipart/acInbound_40x40.png';
+Sidebar.prototype.trackingImage = STENCIL_PATH + '/clipart/acTracking_40x40.png';
+Sidebar.prototype.sendMessageImage = STENCIL_PATH + '/clipart/acSendMessage_40x40.png';
+Sidebar.prototype.endImage = STENCIL_PATH + '/clipart/acEnd_40x40.png';
+
+Sidebar.prototype.pauseImage = STENCIL_PATH + '/clipart/acPause_40x40.png';
+Sidebar.prototype.filterImage = STENCIL_PATH + '/clipart/acFilter_40x40.png';
+Sidebar.prototype.goToImage = STENCIL_PATH + '/clipart/acRoot_40x40.png';
+
+Sidebar.prototype.addContactImage = STENCIL_PATH + '/clipart/acAddContact_40x40.png';
+Sidebar.prototype.removeContactImage = STENCIL_PATH + '/clipart/acRemoveContact_40x40.png';
+Sidebar.prototype.leadScoringImage = STENCIL_PATH + '/clipart/acLoyalty_40x40.png';
 
 /**
  * Specifies the width of the thumbnails.
@@ -383,14 +439,14 @@ Sidebar.prototype.showTooltip = function(elt, cells, w, h, title, showLabel)
 				}
 				else
 				{
-					this.graph2.view.drawPane.style.left = x0 + 'px';
+					this.graph2.view.drawPane.style.right = x0 + 'px';
 					this.graph2.view.drawPane.style.top = y0 + 'px';
 				}
 				
 				// Workaround for ignored position CSS style in IE9
 				// (changes to relative without the following line)
 				this.tooltip.style.position = 'absolute';
-				this.tooltip.style.left = left + 'px';
+				this.tooltip.style.right = left + 'px';
 				this.tooltip.style.top = top + 'px';
 			});
 
@@ -587,9 +643,342 @@ Sidebar.prototype.cloneCell = function(cell, value)
 	{
 		clone.value = value;
 	}
-	
+
 	return clone;
 };
+
+Sidebar.prototype.createPropertyContainer = function() {
+	var div = document.createElement('div');
+
+	var label = document.createElement('div');
+	label.style.backgroundColor = this.inactiveTabBackgroundColor;
+	label.style.borderLeftWidth = '1px';
+	label.style.cursor = 'pointer';
+	label.style.width = '33.3%';
+	label.style.backgroundColor = '#f1f3f4';
+	// Parameter
+	mxUtils.write(label, mxResources.get('parameter'));
+	div.appendChild(label);
+
+	var parameterPanel = div.cloneNode(false);
+	parameterPanel.style.display = '';
+	// parameterPanel.style.overflowY = 'hidden';
+	new ParameterPanel(null, this.editorUi, parameterPanel);
+
+	console.log(parameterPanel.getElementsByClassName("geCollapseSection")[0]);
+	var sidebar = this;
+	mxEvent.addListener(parameterPanel.getElementsByClassName("geCollapseSection")[0], 'click', function(){
+		sidebar.sidebarResize.apply(sidebar, arguments);
+	});
+
+	this.propertyContainer.appendChild(parameterPanel);
+};
+
+Sidebar.prototype.addCompositeContainer = function() {
+
+};
+
+Sidebar.prototype.addTemplateContainer = function(dir, flag) {
+	var editor = this.editorUi.editor;
+
+	var a = document.createElement('a');
+	a.className = 'geItem';
+
+	var ul = document.createElement('ul');
+	ul.className = 'cardForm';
+
+
+	var thumbnail = document.createElement('li');
+	thumbnail.className = 'thumbnail image';
+
+	var img = document.createElement('img');
+	img.className = 'thumbnail';
+	img.src = 'http://localhost:8080/javascript/examples/grapheditor/www/templates/LeadNurturing238x295.png';
+
+	thumbnail.appendChild(img);
+
+	var title = document.createElement('li');
+	title.className = 'desc';
+
+	var span1 = document.createElement('span');
+	span1.className = 'title';
+	span1.innerHTML = '1. Lead Nurturing';
+	title.appendChild(span1);
+
+	var detail = document.createElement('li');
+	detail.className = 'desc';
+
+	var span2 = document.createElement('span');
+	span2.className = 'detail';
+	span2.innerHTML = 'Use this! that take communication efforts<br/>on listening and providing the information and answers you need.';
+
+	detail.appendChild(span2);
+
+	// ul.appendChild(title);
+	// ul.appendChild(thumbnail);
+	// ul.appendChild(detail);
+
+	var img = document.createElement('img');
+	img.className = 'thumbnail2';
+	img.src = 'http://192.168.3.68:8080/javascript/examples/grapheditor/www/templates/card_leadNurturing.png';
+
+	ul.appendChild(img);
+
+	a.appendChild(ul);
+
+	this.templatesContainer.appendChild(a);
+
+	var xmlElement = mxUtils.load('templates/LeadNurturing.xml').getXml().documentElement ;
+	var dropHandler = function () {
+		var x = arguments[3];
+		var y = arguments[4];
+		editor.graph.setSelectionCells(editor.graph.importGraphModel(xmlElement, x, y));
+	};
+
+	var ds = this.createDragSource(ul, dropHandler, this.createDragPreview(250, 250), [], new mxRectangle(0, 0, 250, 250));
+	this.addClickHandler(ul, ds, []);
+
+	var a = document.createElement('a');
+	a.className = 'geItem';
+	var ul = document.createElement('ul');
+	ul.className = 'cardForm';
+
+	var thumbnail = document.createElement('li');
+	thumbnail.className = 'thumbnail image';
+	var img = document.createElement('img');
+	img.className = 'thumbnail';
+	img.src = 'http://localhost:8080/javascript/examples/grapheditor/www/templates/DripCampaign233x231.png';
+
+	thumbnail.appendChild(img);
+
+	var title = document.createElement('li');
+	title.className = 'desc';
+	var span1 = document.createElement('span');
+	span1.className = 'title';
+	span1.innerHTML = '2. Drip Campaign';
+	title.appendChild(span1);
+
+	var detail = document.createElement('li');
+	detail.className = 'desc';
+
+	var span2 = document.createElement('span');
+	span2.className = 'detail';
+	span2.innerHTML = 'Use this! you can set up the messages and schedules when each will be sent to the subscribers.';
+	detail.appendChild(span2);
+
+	// ul.appendChild(title);
+	// ul.appendChild(thumbnail);
+	// ul.appendChild(detail);
+
+	var img = document.createElement('img');
+	img.className = 'thumbnail2';
+	img.src = 'http://192.168.3.68:8080/javascript/examples/grapheditor/www/templates/card_dripCampaign.png';
+
+	ul.appendChild(img);
+
+
+	a.appendChild(ul);
+
+	this.templatesContainer.appendChild(a);
+
+	var xmlElement2 = mxUtils.load('templates/DripCampaign.xml').getXml().documentElement ;
+	var dropHandler = function () {
+		var x = arguments[3];
+		var y = arguments[4];
+		editor.graph.setSelectionCells(editor.graph.importGraphModel(xmlElement2, x, y));
+	};
+
+	var ds = this.createDragSource(ul, dropHandler, this.createDragPreview(250, 250), [], new mxRectangle(0, 0, 250, 250));
+	this.addClickHandler(ul, ds, []);
+};
+
+Sidebar.prototype.addSectionTab = function () {
+	// var div = document.createElement('div');
+	// div.className = 'geFormatSection';
+	// div.style.padding = '12px 0px 12px 18px';
+	// div.style.borderTop = "solid 10px #ddd";
+	// div.style.height = '50px';
+	// div.style.backgroundColor = 'aliceblue';
+	//
+	// var span = document.createElement('div');
+	// span.name = 'subTitle';
+	// span.style.width = '100%';
+	// span.style.marginTop = '0px';
+	// span.style.fontWeight = 'bold';
+	// span.style.fontSize = '16px';
+	// mxUtils.write(span, "Stencil List");
+	//
+	// div.appendChild(span);
+	//
+	// this.stencilContainer.appendChild(div);
+};
+
+Sidebar.prototype.addTabPalette = function(expand, featureContainer, templatesContainer) {
+	var section = document.createElement('div');
+	section.className = 'geFormatSection geSectionHeader';
+	section.style.padding = '12px 0px 12px 0px';
+	section.style.borderTop = "solid 10px #ddd";
+	section.style.height = '56px';
+	section.style.backgroundColor = 'aliceblue';
+
+	var span = document.createElement('div');
+	span.name = 'subTitle';
+	span.style.width = '200px';
+	span.style.marginTop = '0px';
+	span.style.marginLeft = '13px';
+	span.style.fontWeight = 'bold';
+	span.style.fontSize = '16px';
+	span.style.position = 'absolute';
+	mxUtils.write(span, "Stencil List");
+
+	var content = document.createElement('div');
+	// mxUtils.write(content, "+");
+	content.className = 'geCollapseSection';
+	content.style.fontSize = '16px';
+	content.style.fontWeight = 'bold';
+	content.style.float = 'right';
+	content.style.marginRight = '15px';
+
+	section.appendChild(span);
+	section.appendChild(content);
+
+	this.stencilContainer.appendChild(section);
+
+	var div = document.createElement('div');
+	div.className = 'geSidebar';
+	div.style.boxSizing = 'border-box';
+	div.style.overflow = 'hidden';
+	div.style.width = '100%';
+	div.style.paddingLeft = '0px';
+	div.style.paddingTop = '14px';
+	div.style.paddingBottom = '0px';
+
+	var inner = document.createElement('div');
+	inner.style.whiteSpace = 'nowrap';
+	inner.style.textOverflow = 'clip';
+	inner.style.cursor = 'default';
+
+	var ul = document.createElement('ul');
+	ul.className = 'geSidebarTab';
+
+	var li1 = document.createElement('li');
+	var a1 = document.createElement('a');
+	a1.innerHTML = "Feature";
+	var span1 = document.createElement('span');
+	span1.className = 'line';
+	span1.opacity = '1';
+	a1.appendChild(span1);
+	li1.appendChild(a1);
+
+	li1.className = 'active';
+	a1.className = 'active';
+
+	var li2 = document.createElement('li');
+	var a2 = document.createElement('a');
+	a2.innerHTML = "Composite";
+	var span2 = document.createElement('span');
+	span2.className = 'line';
+	a2.appendChild(span2);
+	li2.appendChild(a2);
+
+	var li3 = document.createElement('li');
+	var a3 = document.createElement('a');
+	a3.innerHTML = "Templates";
+	var span3 = document.createElement('span');
+	span3.className = 'line';
+	a3.appendChild(span3);
+	li3.appendChild(a3);
+
+	ul.appendChild(li1);
+	ul.appendChild(li2);
+	ul.appendChild(li3);
+
+	inner.appendChild(ul);
+	div.appendChild(inner);
+
+	section.appendChild(div);
+
+	this.stencilContainer.appendChild(section);
+
+	mxEvent.addListener(ul, 'click', function(evt){
+		var elt_a_list = ul.getElementsByTagName("a");
+		var elt_li_list = ul.getElementsByTagName("li");
+		var elt_length = ul.getElementsByTagName("a").length;
+
+		if ( elt_a_list ) {
+			for ( var i = 0 ; i < elt_length ; i++ ) {
+				elt_a_list[i].className="";
+				elt_li_list[i].className="";
+			}
+			evt.target.className = "active";
+			evt.target.parentElement.className = "active";
+
+			//변경되면, container도 바꾼다.
+			if (evt.target.text === 'Feature') {
+				featureContainer.style.display = '';
+				templatesContainer.style.display = 'none';
+			} else if ( evt.target.text === 'Templates') {
+				featureContainer.style.display = 'none';
+				templatesContainer.style.display = '';
+			}
+		}
+	});
+
+	console.log(content);
+	var sidebar = this;
+	mxEvent.addListener(content, 'click', function() {
+		sidebar.sidebarResize.apply(sidebar,arguments);
+	});
+};
+
+
+Sidebar.prototype.addStartPalette = function(expand) {
+	var lineTags = 'line lines connector connectors connection connections arrow arrows ';
+
+	var fns = [
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;opacity=50;html=1;strokeColor=#d3d1d1;fillColor=#42ff77;image='+this.onlineSignupImage,160,75,'Sign Up','Sign Up이 발생하면 캠페인을 시작합니다.',null,null,'onlineSignupimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#42ff77;image='+this.questionImage,160, 75, 'Added/Updated', 'Data 변경이 발생하면 캠페인을 시작합니다.',null,null,'questionimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#42ff77;image='+this.inboundMessageImage,160, 75,'Inbounded', 'Inbound가 발생하면 캠페인을 시작합니다.',null,null,'inboundMessageimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#42ff77;image='+this.trackingImage,160, 75,'Clicked', '특정 클릭이 발생하면 캠페인을 시작합니다.',null,null,'trackingimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#42ff77;image='+this.sendMessageImage,160, 75,'Outbound','Outbound가 발생하면 캠페인을 시작합니다.',null,null,'sendMessageimageiconsymbol'),
+	];
+
+	this.addPaletteFunctions('StartCells', mxResources.get('StartCells'), (expand != null) ? expand : true, fns);
+};
+
+Sidebar.prototype.addProcessPalette = function(expand) {
+	var lineTags = 'line lines connector connectors connection connections arrow arrows ';
+
+	var fns = [
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#ffb041;image='+this.pauseImage,160, 75,'Pause','플로우에 일시정지 조건을 만듭니다.',null,null,'pauseimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#ffb041;image='+this.filterImage,160, 75,'Filter','플로우의 분기 조건을 만듭니다.',null,null,'filterimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#ffb041;image='+this.onlineSignupImage,160, 75,'Sign Up','Sign Up 발생을 기다립니다.',null,null,'onlineSignupimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#ffb041;image='+this.questionImage,160, 75, 'Added/Updated', 'Data 변경 발생을 기다립니다.',null,null,'questionimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#ffb041;image='+this.inboundMessageImage,160, 75,'Inbounded', 'Inbound 발생을 기다립니다.',null,null,'inboundMessageimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#ffb041;image='+this.trackingImage,160, 75,'Clicked', '특정 클릭 발생을 기다립니다.',null,null,'trackingimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#ffb041;image='+this.goToImage,160, 75,'Go To','플로우에 회귀 및 이동 조건을 만듭니다.',null,null,'gotoimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#ffb041;image='+this.sendMessageImage,160, 75,'Outbound','Outbound 발생을 기다립니다.',null,null,'sendMessageimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=lightslategray;image='+this.endImage,160, 75,'End','끝 지점을 명시합니다.',null,null,'endimageiconsymbol'),
+		this.createVertexTemplateEntry('rhombus;whiteSpace=wrap;html=1;', 80, 80, '', 'Diamond', null, null, 'diamond rhombus if condition decision conditional question test'),
+	];
+
+	this.addPaletteFunctions('ProcessCells', mxResources.get('ProcessCells'), (expand != null) ? expand : true, fns);
+};
+
+Sidebar.prototype.addActionPalette = function(expand) {
+	var lineTags = 'line lines connector connectors connection connections arrow arrows ';
+
+	var fns = [
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#41b9ff;image='+this.sendMessageImage,160, 75,'Send Message','메시지를 보냅니다.',null,null,'sendmessageimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#41b9ff;image='+this.addContactImage,160, 75,'Add Contact','컨택을 리스트에 추가합니다.',null,null,'addContactimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#41b9ff;image='+this.removeContactImage,160, 75,'Remove Contact','컨택을 제거합니다.',null,null,'removeContactimageiconsymbol'),
+		this.createVertexTemplateEntry('label;whiteSpace=wrap;html=1;strokeColor=#d3d1d1;fillColor=#41b9ff;image='+this.leadScoringImage,160, 75,'Lead Scoring','Lead Score를 조정합니다.',null,null,'leadscoringtrackingimageiconsymbol'),
+		//lead scoring 추가
+	];
+
+	this.addPaletteFunctions('ActionCells', mxResources.get('ActionCells'), (expand != null) ? expand : true, fns);
+};
+
 
 /**
  * Adds shape search UI.
@@ -598,7 +987,7 @@ Sidebar.prototype.addSearchPalette = function(expand)
 {
 	var elt = document.createElement('div');
 	elt.style.visibility = 'hidden';
-	this.container.appendChild(elt);
+	this.featureContainer.appendChild(elt);
 		
 	var div = document.createElement('div');
 	div.className = 'geSidebar';
@@ -897,7 +1286,7 @@ Sidebar.prototype.addSearchPalette = function(expand)
 
 	var outer = document.createElement('div');
     outer.appendChild(div);
-    this.container.appendChild(outer);
+	this.featureContainer.appendChild(outer);
 	
     // Keeps references to the DOM nodes
 	this.palettes['search'] = [elt, outer];
@@ -1153,7 +1542,7 @@ Sidebar.prototype.createAdvancedShapes = function()
 		{
 			return sb.createVertexTemplateFromData('zZXRaoMwFIafJpcDjbNrb2233rRQ8AkyPdPQaCRJV+3T7yTG2rUVBoOtgpDzn/xJzncCIdGyateKNeVW5iBI9EqipZLS9KOqXYIQhAY8J9GKUBrgT+jbRDZ02aBhCmrzEwPtDZ9MHKBXdkpmoDWKCVN9VptO+Kw+8kqwGqMkK7nIN6yTB7uTNizbD1FSSsVPsjYMC1qFKHxwIZZSSIVxLZ1/nJNar5+oQPMT7IYCrqUta1ENzuqGaeOFTArBGs3f3Vmtoo2Se7ja1h00kSoHK4bBIKUNy3hdoPYU0mF91i9mT8EEL2ocZ3gKa00ayWujLZY4IfHKFonVDLsRGgXuQ90zBmWgneyTk3yT1iArMKrDKUeem9L3ajHrbSXwohxsQd/ggOleKM7ese048J2/fwuim1uQGmhQCW8vQMkacP3GCQgBFMftHEsr7cYYe95CnmKTPMFbYD8CQ++DGQy+/M5X4ku5wHYmdIktfvk9tecpavThqS3m/0YtnqIWPTy1cD77K2wYjo+Ay317I74A', 296, 100, 'Process Bar');
 		}),
-	 	this.createVertexTemplateEntry('swimlane;', 200, 200, 'Container', 'Container', null, null, 'container swimlane lane pool group'),
+	 	this.createVertexTemplateEntry('swimlane;', 200, 200, 'Container', 'Container', null, null, 'swimlane lane pool group'),
 		this.addEntry('list group erd table', function()
 		{
 			var cell = new mxCell('List', new mxGeometry(0, 0, 140, 110),
@@ -1815,7 +2204,7 @@ Sidebar.prototype.createThumb = function(cells, width, height, parent, title, sh
 	this.graph.view.scaleAndTranslate(s, Math.floor((width - bounds.width * s) / 2 / s - bounds.x),
 			Math.floor((height - bounds.height * s) / 2 / s - bounds.y));
 	var node = null;
-	
+
 	// For supporting HTML labels in IE9 standards mode the container is cloned instead
 	if (this.graph.dialect == mxConstants.DIALECT_SVG && !mxClient.NO_FO &&
 		this.graph.view.getCanvas().ownerSVGElement != null)
@@ -2038,7 +2427,7 @@ Sidebar.prototype.createDropHandler = function(cells, allowSplit, allowCellsInse
 		if (elt == null && graph.isEnabled())
 		{
 			cells = graph.getImportableCells(cells);
-			
+
 			if (cells.length > 0)
 			{
 				graph.stopEditing();
@@ -2123,7 +2512,8 @@ Sidebar.prototype.createDropHandler = function(cells, allowSplit, allowCellsInse
 					}
 				}
 			}
-			
+
+			console.log("drop");
 			mxEvent.consume(evt);
 		}
 	});
@@ -2827,7 +3217,7 @@ Sidebar.prototype.createDragSource = function(elt, dropHandler, preview, cells, 
 			// Sets active Arrow as side effect
 			var tmp = (graph.model.isEdge(currentStyleTarget.cell)) ? graph.view.getPoint(currentStyleTarget) : new mxPoint(currentStyleTarget.getCenterX(), currentStyleTarget.getCenterY());
 			tmp = new mxRectangle(tmp.x - this.refreshTarget.width / 2, tmp.y - this.refreshTarget.height / 2,
-				this.refreshTarget.width, this.refreshTarget.height);
+				this.refreshTarget.width, this.Target.height);
 			checkArrow(x, y, tmp, styleTarget);
 		}
 		
@@ -3341,7 +3731,7 @@ Sidebar.prototype.addPaletteFunctions = function(id, title, expanded, fns)
 Sidebar.prototype.addPalette = function(id, title, expanded, onInit)
 {
 	var elt = this.createTitle(title);
-	this.container.appendChild(elt);
+	this.featureContainer.appendChild(elt);
 	
 	var div = document.createElement('div');
 	div.className = 'geSidebar';
@@ -3366,7 +3756,7 @@ Sidebar.prototype.addPalette = function(id, title, expanded, onInit)
 	
 	var outer = document.createElement('div');
     outer.appendChild(div);
-    this.container.appendChild(outer);
+	this.featureContainer.appendChild(outer);
     
     // Keeps references to the DOM nodes
     if (id != null)
@@ -3463,7 +3853,7 @@ Sidebar.prototype.removePalette = function(id)
 		
 		for (var i = 0; i < elts.length; i++)
 		{
-			this.container.removeChild(elts[i]);
+			this.featureContainer.removeChild(elts[i]);
 		}
 		
 		return true;
@@ -3592,6 +3982,60 @@ Sidebar.prototype.addStencilPalette = function(id, title, stencilFile, style, ig
 				}
 			}), true);
 	    }));
+	}
+};
+
+Sidebar.prototype.sidebarResize = function (evt) {
+	console.log("-----------------");
+	console.log(evt);
+	if (evt) {
+		console.log(Object.keys(evt));
+		console.log(evt.constructor.name);
+	}
+
+	console.log(this);
+
+	this.screenY = document.documentElement.clientHeight - 125;
+
+	if ( evt == null ) {
+		this.stencilContainer.style.height = (this.screenY * 0.75) + 'px';
+		this.featureContainer.style.height = (this.screenY * 0.75) - 91 + 'px';
+
+		this.propertyContainer.style.height = (this.screenY * 0.25) + 'px';
+		this.propertyContainer.firstChild.style.height = (this.screenY * 0.25) + 'px';
+
+		this.stencilContainer.getElementsByClassName('geCollapseSection')[0].className = 'geCollapseSection active';
+		this.propertyContainer.getElementsByClassName('geCollapseSection')[0].className = 'geCollapseSection';
+	} else if ( evt.constructor.name == "MouseEvent") {
+		if ( evt.path[2].className == "geStencilContainer") {
+			this.stencilContainer.style.height = (this.screenY * 0.75) + 'px';
+			this.featureContainer.style.height = (this.screenY * 0.75) - 91 + 'px';
+
+			this.propertyContainer.style.height = (this.screenY * 0.25) + 'px';
+			this.propertyContainer.firstChild.style.height = (this.screenY * 0.25) + 'px';
+
+			this.stencilContainer.getElementsByClassName('geCollapseSection')[0].className = 'geCollapseSection active';
+			this.propertyContainer.getElementsByClassName('geCollapseSection')[0].className = 'geCollapseSection';
+		} else {
+			this.propertyContainer.style.height = (this.screenY * 0.75) + 'px';
+			this.propertyContainer.firstChild.style.height = (this.screenY * 0.75) + 'px';
+
+			this.stencilContainer.style.height = (this.screenY * 0.25) + 'px';
+			this.featureContainer.style.height = (this.screenY * 0.25) - 91 + 'px';
+
+			this.stencilContainer.getElementsByClassName('geCollapseSection')[0].className = 'geCollapseSection';
+			this.propertyContainer.getElementsByClassName('geCollapseSection')[0].className = 'geCollapseSection active';
+		}
+
+	} else {
+		this.propertyContainer.style.height = (this.screenY * 0.75) + 'px';
+		this.propertyContainer.firstChild.style.height = (this.screenY * 0.75) + 'px';
+
+		this.stencilContainer.style.height = (this.screenY * 0.25) + 'px';
+		this.featureContainer.style.height = (this.screenY * 0.25) - 91 + 'px';
+
+		this.stencilContainer.getElementsByClassName('geCollapseSection')[0].className = 'geCollapseSection';
+		this.propertyContainer.getElementsByClassName('geCollapseSection')[0].className = 'geCollapseSection active';
 	}
 };
 
