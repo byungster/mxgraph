@@ -30,7 +30,7 @@ Menus.prototype.defaultFontSize = '12';
 /**
  * Sets the default font size.
  */
-Menus.prototype.defaultMenuItems = ['file', 'edit', 'view', 'arrange', 'extras', 'layout', 'help'];
+Menus.prototype.defaultMenuItems = ['file', 'edit', 'view', 'arrange', 'extras', 'help'];
 
 /**
  * Adds the label menu items to the given menu and parent.
@@ -1116,7 +1116,6 @@ Menus.prototype.createPopupMenu = function(menu, cell, evt)
 Menus.prototype.createMenubar = function(container)
 {
 	var menubar = new Menubar(this.editorUi, container);
-
 	var menus = this.defaultMenuItems;
 	
 	for (var i = 0; i < menus.length; i++)

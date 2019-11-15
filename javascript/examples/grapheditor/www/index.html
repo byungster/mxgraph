@@ -38,8 +38,6 @@
 		// Default resources are included in grapheditor resources
 		mxLoadResources = false;
 	</script>
-
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script type="text/javascript" src="js/Init.js"></script>
 	<script type="text/javascript" src="deflate/pako.min.js"></script>
 	<script type="text/javascript" src="deflate/base64.js"></script>
@@ -51,8 +49,6 @@
 	<script type="text/javascript" src="js/Sidebar.js"></script>
 	<script type="text/javascript" src="js/Graph.js"></script>
 	<script type="text/javascript" src="js/Format.js"></script>
-	<script type="text/javascript" src="js/CellParamList.js"></script>
-	<script type="text/javascript" src="js/ResourceList.js"></script>
 	<script type="text/javascript" src="js/Shapes.js"></script>
 	<script type="text/javascript" src="js/Actions.js"></script>
 	<script type="text/javascript" src="js/Menus.js"></script>
@@ -61,11 +57,6 @@
 </head>
 <body class="geEditor">
 	<script type="text/javascript">
-		var bhtest;
-		var bhformat;
-		var test = $(window);
-		var test = $(document);
-		console.log(test);
 		// Extends EditorUi to update I/O action states based on availability of backend
 		(function()
 		{
@@ -108,7 +99,7 @@
 				themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement(); 
 				
 				// Main
-				bhtest = new EditorUi(new Editor(urlParams['chrome'] == '0', themes));
+				new EditorUi(new Editor(urlParams['chrome'] == '0', themes));
 			}, function()
 			{
 				document.body.innerHTML = '<center style="margin-top:10%;">Error loading resource files. Please check browser console.</center>';

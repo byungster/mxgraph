@@ -51,7 +51,7 @@ Format.prototype.init = function()
 		this.clearSelectionState();
 		this.refresh();
 	});
-
+	
 	graph.getSelectionModel().addListener(mxEvent.CHANGE, this.update);
 	graph.addListener(mxEvent.EDITING_STARTED, this.update);
 	graph.addListener(mxEvent.EDITING_STOPPED, this.update);
@@ -62,13 +62,11 @@ Format.prototype.init = function()
 	}));
 	
 	editor.addListener('autosaveChanged', mxUtils.bind(this, function()
-		{
-			this.refresh();
+	{
+		this.refresh();
 	}));
 	
 	this.refresh();
-
-	bhformat = this;
 };
 
 /**
@@ -400,7 +398,7 @@ Format.prototype.refresh = function()
 			img.style.border = '1px solid transparent';
 			img.style.padding = '1px';
 			img.style.opacity = 0.5;
-			label.appendChild(img);
+			label.appendChild(img)
 			
 			mxEvent.addListener(img, 'click', function()
 			{
@@ -422,7 +420,7 @@ Format.prototype.refresh = function()
 		var containsLabel = this.getSelectionState().containsLabel;
 		var currentLabel = null;
 		var currentPanel = null;
-
+		
 		var addClickHandler = mxUtils.bind(this, function(elt, panel, index)
 		{
 			var clickHandler = mxUtils.bind(this, function(evt)
@@ -472,9 +470,6 @@ Format.prototype.refresh = function()
 			
 			if (index == ((containsLabel) ? this.labelIndex : this.currentIndex))
 			{
-				//DROP하면 여기서 이벤트가 발생한다.
-
-				console.trace();
 				// Invokes handler directly as a workaround for no click on DIV in KHTML.
 				clickHandler();
 			}
@@ -489,45 +484,11 @@ Format.prototype.refresh = function()
 		label.style.width = (containsLabel) ? '50%' : '33.3%';
 		var label2 = label.cloneNode(false);
 		var label3 = label2.cloneNode(false);
-		var label4 = label3.cloneNode(false);
 
 		// Workaround for ignored background in IE
 		label2.style.backgroundColor = this.inactiveTabBackgroundColor;
 		label3.style.backgroundColor = this.inactiveTabBackgroundColor;
-		label4.style.backgroundColor = this.inactiveTabBackgroundColor;
-
-
-
-		// Parameter
-		mxUtils.write(label4, mxResources.get('parameter'));
-		div.appendChild(label4);
-
-		var parameterPanel = div.cloneNode(false);
-		parameterPanel.style.display = 'none';
-		this.panels.push(new ParameterPanel(this, ui, parameterPanel));
-		this.container.appendChild(parameterPanel);
-
-
-
-		// Text
-		mxUtils.write(label2, mxResources.get('text'));
-		div.appendChild(label2);
-
-		var textPanel = div.cloneNode(false);
-		textPanel.style.display = 'none';
-		this.panels.push(new TextFormatPanel(this, ui, textPanel));
-		this.container.appendChild(textPanel);
 		
-		// Arrange
-		// mxUtils.write(label3, mxResources.get('arrange'));
-		// div.appendChild(label3);
-		//
-		// var arrangePanel = div.cloneNode(false);
-		// arrangePanel.style.display = 'none';
-		// this.panels.push(new ArrangePanel(this, ui, arrangePanel));
-		// this.container.appendChild(arrangePanel);
-
-
 		// Style
 		if (containsLabel)
 		{
@@ -538,18 +499,35 @@ Format.prototype.refresh = function()
 			label.style.borderLeftWidth = '0px';
 			mxUtils.write(label, mxResources.get('style'));
 			div.appendChild(label);
-
+			
 			var stylePanel = div.cloneNode(false);
 			stylePanel.style.display = 'none';
 			this.panels.push(new StyleFormatPanel(this, ui, stylePanel));
 			this.container.appendChild(stylePanel);
 
+			addClickHandler(label, stylePanel, idx++);
 		}
+		
+		// Text
+		mxUtils.write(label2, mxResources.get('text'));
+		div.appendChild(label2);
 
-		addClickHandler(label4, parameterPanel, idx++);
-		addClickHandler(label, stylePanel, idx++);
+		var textPanel = div.cloneNode(false);
+		textPanel.style.display = 'none';
+		this.panels.push(new TextFormatPanel(this, ui, textPanel));
+		this.container.appendChild(textPanel);
+		
+		// Arrange
+		mxUtils.write(label3, mxResources.get('arrange'));
+		div.appendChild(label3);
+
+		var arrangePanel = div.cloneNode(false);
+		arrangePanel.style.display = 'none';
+		this.panels.push(new ArrangePanel(this, ui, arrangePanel));
+		this.container.appendChild(arrangePanel);
+		
 		addClickHandler(label2, textPanel, idx++);
-
+		addClickHandler(label3, arrangePanel, idx++);
 	}
 };
 
@@ -597,6 +575,7 @@ BaseFormatPanel.prototype.getSelectionState = function()
 					return null;
 				}
 			}
+			
 		}
 	}
 	
@@ -1296,7 +1275,7 @@ BaseFormatPanel.prototype.addUnitInput = function(container, unit, right, width,
 	input.style.right = (right + 12) + 'px';
 	input.style.width = width + 'px';
 	container.appendChild(input);
-
+	
 	var stepper = this.createStepper(input, update, step, null, disableFocus);
 	stepper.style.marginTop = (marginTop - 2) + 'px';
 	stepper.style.right = right + 'px';
@@ -1454,31 +1433,6 @@ BaseFormatPanel.prototype.styleButtons = function(elts)
 		elts[i].style.width = '24px';
 		elts[i].style.height = '20px';
 		elts[i].className += ' geColorBtn';
-	}
-};
-
-/**
- *
- */
-BaseFormatPanel.prototype.createParameterOption = function(label, colorKey, defaultColor, callbackFn, setStyleFn)
-{
-	return this.createFeatureListOption(label, null, null, null, null, null);
-};
-
-BaseFormatPanel.prototype.createFeatureListOption = function(label) {
-	{
-		var div = document.createElement('div');
-		div.style.padding = '6px 0px 1px 0px';
-		div.style.whiteSpace = 'nowrap';
-		div.style.overflow = 'hidden';
-		div.style.width = '200px';
-		div.style.height = (mxClient.IS_QUIRKS) ? '27px' : '18px';
-
-		var span = document.createElement('span');
-		mxUtils.write(span, label);
-		div.appendChild(span);
-
-		return div;
 	}
 };
 
@@ -2995,11 +2949,11 @@ TextFormatPanel.prototype.addFont = function(container)
 			}
 		}
 	}, true);
-
+	
 	var stepper = this.createStepper(input, inputUpdate, 1, 10, true, Menus.prototype.defaultFontSize);
 	stepper.style.display = input.style.display;
 	stepper.style.marginTop = '4px';
-
+	
 	if (!mxClient.IS_QUIRKS)
 	{
 		stepper.style.right = '20px';
@@ -4824,7 +4778,7 @@ StyleFormatPanel.prototype.addStroke = function(container)
 		{
 			styleSelect.value = 'curved';
 		}
-		else if (mxUtils.getValue(ss.style, mxConstants.STYLE_1, null) == '1')
+		else if (mxUtils.getValue(ss.style, mxConstants.STYLE_ROUNDED, null) == '1')
 		{
 			styleSelect.value = 'rounded';
 		}
@@ -5708,309 +5662,3 @@ DiagramFormatPanel.prototype.destroy = function()
 		this.gridEnabledListener = null;
 	}
 };
-
-ParameterPanel = function(format, editorUi, container)
-{
-	BaseFormatPanel.call(this, format, editorUi, container);
-	this.init();
-
-	var ui = editorUi;
-};
-
-mxUtils.extend(ParameterPanel, BaseFormatPanel);
-
-//parametor panel은 Form 형태이다.
-
-ParameterPanel.prototype.init = function() {
-	//Sub Title
-	this.container.appendChild(this.addSubTitle(this.createPanel()));
-
-	//Guide Message
-	this.container.appendChild(this.addGuideMessage(this.createPanel()));
-
-	//Select Box
-	this.container.appendChild(this.addSelectBoxContent(this.createPanel()));
-
-	//Radio Button
-	this.container.appendChild(this.addRadioBtnContent(this.createPanel()));
-
-	//Include Current Cotacts
-	this.container.appendChild(this.addCheckBoxContent(this.createPanel()));
-
-	//Button Reset / Save
-	this.container.appendChild(this.addBtnContent(this.createPanel()));
-};
-
-ParameterPanel.prototype.addSubTitle = function(div) {
-	div.style.borderTop = "solid 10px #ddd";
-	div.style.height = '50px';
-	div.style.backgroundColor = 'aliceblue';
-	div.className = "geFormatSection geSectionHeader";
-
-	var span = document.createElement('div');
-	span.name = 'subTitle';
-	span.style.width = '250px';
-	span.style.marginTop = '0px';
-	span.style.fontWeight = 'bold';
-	span.style.fontSize = '16px';
-	span.style.position = 'absolute';
-	mxUtils.write(span, "Property List");
-
-
-	var content = document.createElement('div');
-	// mxUtils.write(content, "+");
-	content.className = 'geCollapseSection';
-	content.style.fontSize = '16px';
-	content.style.fontWeight = 'bold';
-	content.style.float = 'right';
-	content.style.marginRight = '15px';
-
-	var ui = this.editorUi;
-	console.log(ui);
-	mxEvent.addListener(content, 'click', function(){
-		ui.sidebar.sidebarResize.apply(ui.sidebar, arguments);
-	});
-
-	var span2 = document.createElement('div');
-	span2.name = 'subTitle';
-	span2.style.paddingLeft = '20px';
-	span2.style.paddingTop = '15px';
-	span2.style.marginTop = '18px';
-	span2.style.width = '100%';
-	span2.style.fontWeight = 'bold';
-	span2.style.fontSize = '13px';
-	mxUtils.write(span2, "Required Fields");
-
-	var strong = document.createElement('strong');
-	strong.style.color = 'red';
-	strong.style.paddingLeft = '6px';
-	strong.style.fontSize = '14px';
-	mxUtils.write(strong, "*");
-	span2.appendChild(strong);
-
-	div.appendChild(span);
-	div.appendChild(content);
-	div.appendChild(span2);
-
-	return div;
-};
-
-ParameterPanel.prototype.addGuideMessage = function(div) {
-	var span = document.createElement('span');
-	span.style.width = '90%';
-	span.style.display = 'block';
-	span.style.fontWeight = 'bold';
-	span.style.paddingBottom = '6px';
-	mxUtils.write(span, 'Information');
-	div.appendChild(span);
-
-	var span = document.createElement('span');
-	span.style.width = '90%';
-	span.style.fontSize = '10px';
-	span.style.wordBreak = 'break-all';
-	span.style.whiteSpace = 'pre';
-	mxUtils.write(span, "The Auto Campaign will start when your\ncontacts text in the following Mobile Keyword.\nYou may also select a message option\nwhere contacts have texted in a message\nfollowing the keyword.");
-	div.appendChild(span);
-
-	return div;
-};
-
-ParameterPanel.prototype.addSelectBoxContent = function(div) {
-
-	var ui = this.editorUi;
-	var graph = ui.editor.graph;
-
-	div.style.paddingTop = '4px';
-	div.style.paddingBottom = '4px';
-	div.style.whiteSpace = 'normal';
-
-	var colorPanel = document.createElement('div');
-	colorPanel.style.fontWeight = 'bold';
-
-	// Adds gradient direction option
-	var styleSelect = document.createElement('select');
-	styleSelect.id = 'select_keyword';
-	styleSelect.style.marginTop = '10px';
-	styleSelect.style.marginBottom = '7px';
-	styleSelect.style.width = '80%';
-
-	var styles = ['inboundKeyword', 'SINMUNMUL', '2019BHKIM'];
-
-	for (var i = 0; i < styles.length; i++)
-	{
-		var styleOption = document.createElement('option');
-		styleOption.setAttribute('value', styles[i]);
-		mxUtils.write(styleOption, styles[i]);
-		styleSelect.appendChild(styleOption);
-	}
-
-	var label = mxResources.get('keywordList');
-	var lineColor = document.createElement('div');
-	var span = document.createElement('span');
-	span.style.display = 'block';
-	mxUtils.write(span, label);
-
-	lineColor.appendChild(span);
-	lineColor.appendChild(styleSelect);
-	colorPanel.appendChild(lineColor);
-
-	div.appendChild(colorPanel);
-
-	this.listeners.push({destroy: function() { graph.getModel().removeListener(); }});
-
-	return div;
-
-};
-
-ParameterPanel.prototype.addRadioBtnContent = function(div) {
-	//label
-	var span = document.createElement('span');
-	span.style.display = 'block';
-	span.style.fontWeight = 'bold';
-	span.style.paddingBottom = '7px';
-	mxUtils.write(span, "Start When :");
-
-	//radio1
-	var div1 = document.createElement('div');
-	div1.style.padding = '6px 0px 1px 0px';
-	div1.style.whiteSpace = 'pre';
-	div1.style.display = 'block';
-	div1.style.width = '200px';
-	div1.style.height = '18px';
-
-	var rb = document.createElement('input');
-	rb.setAttribute('type', 'radio');
-	rb.setAttribute('name', 'start_type');
-	rb.style.margin = '0px 6px 0px 0px';
-	div1.appendChild(rb);
-
-	var span1 = document.createElement('span');
-	span1.style.fontSize = '10px';
-	mxUtils.write(span1, "Contacts text the Mobile Keyword");
-	div1.appendChild(span1);
-
-	//radio2
-	var div2 = document.createElement('div');
-	div2.style.padding = '6px 0px 1px 0px';
-	div2.style.whiteSpace = 'pre';
-	div2.style.display = 'block';
-	div2.style.width = '200px';
-	div2.style.height = '18px';
-
-	var rb = document.createElement('input');
-	rb.setAttribute('type', 'radio');
-	rb.setAttribute('name', 'start_type');
-	rb.style.margin = '0px 6px 0px 0px';
-	div2.appendChild(rb);
-
-	var span2 = document.createElement('span');
-	span2.style.fontSize = '10px';
-	mxUtils.write(span2, "Contacts text the Mobile Keyword followed by any message");
-	div2.appendChild(span2);
-
-	//radio3
-	var div3 = document.createElement('div');
-	div3.style.padding = '6px 0px 1px 0px';
-	div3.style.whiteSpace = 'pre';
-	div3.style.display = 'block';
-	div3.style.width = '200px';
-	div3.style.height = '18px';
-
-	var rb = document.createElement('input');
-	rb.setAttribute('type', 'radio');
-	rb.setAttribute('name', 'start_type');
-	rb.style.margin = '0px 6px 0px 0px';
-	div3.appendChild(rb);
-
-	var span3 = document.createElement('span');
-	span3.style.fontSize = '10px';
-	mxUtils.write(span3, "Contacts text the Mobile Keyword followed by any message that");
-	div3.appendChild(span3);
-
-
-	div.appendChild(span);
-	div.appendChild(div1);
-	div.appendChild(div2);
-	div.appendChild(div3);
-
-	return div;
-};
-
-ParameterPanel.prototype.addCheckBoxContent = function(div) {
-
-	var span = document.createElement('span');
-	span.style.display = 'block';
-	span.style.fontWeight = 'bold';
-	mxUtils.write(span, "Include current contacts");
-
-	div.appendChild(span);
-
-	var addOption = mxUtils.bind(this, function(label, key, defaultValue)
-	{
-		var opt = this.createCellOption(label, key, defaultValue);
-		opt.style.width = '100%';
-		opt.style.maginTop = '7px';
-		opt.style.fontSize = '10px';
-		opt.style.whiteSpace = 'pre';
-		opt.style.height = '100%';
-		div.appendChild(opt);
-	});
-
-	addOption("Include all contacts who have\npreviously textedinto the selected \nMobile Keyword with the above options.", mxConstants.STYLE_ROUNDED, 0);
-
-	return div;
-};
-
-ParameterPanel.prototype.addBtnContent = function(div) {
-	var btn = null;
-
-	if (this.editorUi.editor.graph.getSelectionCount() == 1)
-	{
-		btn = mxUtils.button("Reset All", mxUtils.bind(this, function(evt)
-		{
-			this.editorUi.actions.get('editStyle').funct();
-		}));
-
-		btn.setAttribute('title', 'Reset All' + ' (' + this.editorUi.actions.get('editStyle').shortcut + ')');
-		btn.style.width = '202px';
-		btn.style.marginBottom = '2px';
-
-		div.appendChild(btn);
-	}
-
-
-		var btn2 = mxUtils.button('Save Current', mxUtils.bind(this, function(evt)
-		{
-			this.editorUi.actions.get('image').funct();
-		}));
-
-		btn2.setAttribute('title', 'Save Current');
-		btn2.style.marginBottom = '2px';
-
-		if (btn == null)
-		{
-			btn2.style.width = '202px';
-		}
-		else
-		{
-			btn.style.width = '100px';
-			btn2.style.width = '100px';
-			btn2.style.marginLeft = '2px';
-		}
-
-		div.appendChild(btn2);
-
-
-	return div;
-};
-
-ParameterPanel.prototype.destroy = function () {
-	BaseFormatPanel.prototype.destroy.apply(this, arguments);
-
-	if (this.gridEnabledListener)
-	{
-		this.editorUi.removeListener(this.gridEnabledListener);
-		this.gridEnabledListener = null;
-	}
-};
-

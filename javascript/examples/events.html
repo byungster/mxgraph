@@ -29,7 +29,9 @@
 		{
 			// Sets the image to be used for creating new connections
 			mxConnectionHandler.prototype.connectImage = new mxImage('images/green-dot.gif', 14, 14);
-			
+
+
+
 			// Checks if browser is supported
 			if (!mxClient.isBrowserSupported())
 			{
@@ -59,7 +61,7 @@
 				}
 
 				document.body.appendChild(container);
-			
+
 				// Creates the graph inside the DOM node.
 				// Optionally you can enable panning, tooltips and connections
 				// using graph.setPanning(), setTooltips() & setConnectable().
@@ -71,11 +73,11 @@
 				graph.setPanning(true);
 				graph.setTooltips(true);
 				graph.setConnectable(true);
-				
+
 				// Automatically handle parallel edges
  				var layout = new mxParallelEdgeLayout(graph);
  				var layoutMgr = new mxLayoutManager(graph);
- 				
+
  				layoutMgr.getLayout = function(cell)
 				{
 					if (cell.getChildCount() > 0)
@@ -83,7 +85,7 @@
 						return layout;
 					}
 				};
-				
+
 				// Enables rubberband (marquee) selection and a handler
 				// for basic keystrokes (eg. return, escape during editing).
 				var rubberband = new mxRubberband(graph);
@@ -97,7 +99,7 @@
 				var style = graph.getStylesheet().getDefaultEdgeStyle();
 				style[mxConstants.STYLE_ROUNDED] = true;
 				style[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector;
-		
+
 				graph.alternateEdgeStyle = 'elbow=vertical';
 
 				// Installs a custom tooltip for cells
@@ -105,17 +107,17 @@
 				{
 					return 'Doubleclick and right- or shiftclick';
 				}
-				
+
 				// Installs a popupmenu handler using local function (see below).
 				graph.popupMenuHandler.factoryMethod = function(menu, cell, evt)
 				{
 					return createPopupMenu(graph, menu, cell, evt);
 				};
-				
+
 				// Gets the default parent for inserting new cells. This
 				// is normally the first child of the root (ie. layer 0).
 				var parent = graph.getDefaultParent();
-								
+
 				// Adds cells to the model in a single step
 				graph.getModel().beginUpdate();
 				try
@@ -134,7 +136,7 @@
 				}
 			}
 		};
-		
+
 		// Function to create the entries in the popupmenu
 		function createPopupMenu(graph, menu, cell, evt)
 		{

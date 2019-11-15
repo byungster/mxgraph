@@ -1,6 +1,6 @@
 <!--
   Copyright (c) 2006-2013, JGraph Ltd
-  
+
   UIConfig example for mxGraph. This example demonstrates using a config
   file to configure the toolbar and popup menu in mxEditor.
 -->
@@ -33,7 +33,7 @@
 			else
 			{
 				mxLog.show();
-				
+
 				// Creates the graph inside the given container. The
 				// editor is used to create certain functionality for the
 				// graph, such as the rubberband selection, but most parts
@@ -62,11 +62,11 @@
 				// Creates the second toolbar programmatically
 				var container = document.getElementById('toolbar');
 				var toolbar = new mxDefaultToolbar(container, editor);
-				
+
 				// Use eg. mxResources.get("delete") to translate tooltip
 				toolbar.addItem('Show XML', 'images/icons48/gear.png', 'myFirstAction');
 				toolbar.addItem('Delete', 'images/icons48/keys.png', 'delete');
-				
+
 				console.log('editor', editor);
 			}
 		}

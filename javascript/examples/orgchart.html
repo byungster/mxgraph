@@ -21,7 +21,7 @@
 	<script type="text/javascript">
 		// Makes the shadow brighter
 		mxConstants.SHADOWCOLOR = '#C0C0C0';
-		
+		var bhgraph;
 		// Program starts here. Creates a sample graph in the
 		// DOM node with the specified ID. This function is invoked
 		// from the onLoad event handler of the document (see below).
@@ -63,7 +63,7 @@
 			    }
 			    else if (mxClient.IS_NS)
 			    {
-			    	container.style.background = '-moz-linear-gradient(top, #FFFFFF, #E7E7E7)';  
+			    	container.style.background = '-moz-linear-gradient(top, #FFFFFF, #E7E7E7)';
 			    }
 			    else if (mxClient.IS_IE)
 			    {
@@ -75,7 +75,8 @@
 
 				// Creates the graph inside the given container
 				var graph = new mxGraph(container);
-				
+				bhgraph = graph;
+
 				// Enables automatic sizing for vertices after editing and
 				// panning by using the left mouse button.
 				graph.setCellsMovable(false);
@@ -93,34 +94,34 @@
 				// Creates the outline (navigator, overview) for moving
 				// around the graph in the top, right corner of the window.
 				var outln = new mxOutline(graph, outline);
-				
+
 				// Disables tooltips on touch devices
 				graph.setTooltips(!mxClient.IS_TOUCH);
 
 				// Set some stylesheet options for the visual appearance of vertices
 				var style = graph.getStylesheet().getDefaultVertexStyle();
 				style[mxConstants.STYLE_SHAPE] = 'label';
-				
+
 				style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
 				style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_LEFT;
-				style[mxConstants.STYLE_SPACING_LEFT] = 54;
-				
+				style[mxConstants.STYLE_SPACING_LEFT] = 5;
+
 				style[mxConstants.STYLE_GRADIENTCOLOR] = '#7d85df';
 				style[mxConstants.STYLE_STROKECOLOR] = '#5d65df';
 				style[mxConstants.STYLE_FILLCOLOR] = '#adc5ff';
-				
+
 				style[mxConstants.STYLE_FONTCOLOR] = '#1d258f';
 				style[mxConstants.STYLE_FONTFAMILY] = 'Verdana';
 				style[mxConstants.STYLE_FONTSIZE] = '12';
 				style[mxConstants.STYLE_FONTSTYLE] = '1';
-				
+
 				style[mxConstants.STYLE_SHADOW] = '1';
 				style[mxConstants.STYLE_ROUNDED] = '1';
 				style[mxConstants.STYLE_GLASS] = '1';
-				
-				style[mxConstants.STYLE_IMAGE] = 'editors/images/dude3.png';
-				style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
-				style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
+
+				// style[mxConstants.STYLE_IMAGE] = 'editors/images/dude3.png';
+				// style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
+				// style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
 				style[mxConstants.STYLE_SPACING] = 8;
 
 				// Sets the default style for edges
@@ -133,7 +134,7 @@
 				style[mxConstants.STYLE_ENTRY_X] = 0.5; // center
 				style[mxConstants.STYLE_ENTRY_Y] = 0; // top
 				style[mxConstants.STYLE_ENTRY_PERIMETER] = 0; // disabled
-				
+
 				// Disable the following for straight lines
 				style[mxConstants.STYLE_EDGE] = mxEdgeStyle.TopToBottom;
 
@@ -185,7 +186,7 @@
 
 					return result;
 				};
-				
+
 				// Sets the maximum text scale to 1
 				graph.cellRenderer.getTextScale = function(state)
 				{
@@ -197,20 +198,20 @@
 				graph.cellRenderer.getLabelValue = function(state)
 				{
 					var result = state.cell.value;
-					
+
 					if (state.view.graph.getModel().isVertex(state.cell))
 					{
 						if (state.view.scale > 1)
 						{
 							result += '\nDetails 1';
 						}
-						
+
 						if (state.view.scale > 1.3)
 						{
 							result += '\nDetails 2';
 						}
 					}
-					
+
 					return result;
 				};
 
@@ -224,7 +225,7 @@
 				{
 					var w = graph.container.offsetWidth;
 					var v1 = graph.insertVertex(parent, 'treeRoot',
-						'Organization', w/2 - 30, 20, 140, 60, 'image=editors/images/house.png');
+						'Organization', w/2 - 30, 20, 140, 60);
 					graph.updateCellSize(v1);
 					addOverlays(graph, v1, false);
 				}
@@ -248,7 +249,7 @@
 				{
 					graph.zoomOut();
 				});
-				
+
 				tb.addItem('Actual Size', 'images/view_1_132.png',function(evt)
 				{
 					graph.zoomActual();
@@ -352,7 +353,7 @@ function addOverlays(graph, cell, addDeleteIcon)
 	{
 		addChild(graph, cell);
 	}));
-	
+
 	graph.addCellOverlay(cell, overlay);
 
 	if (addDeleteIcon)
@@ -366,7 +367,7 @@ function addOverlays(graph, cell, addDeleteIcon)
 		{
 			deleteSubtree(graph, cell);
 		}));
-	
+
 		graph.addCellOverlay(cell, overlay);
 	}
 };
@@ -407,7 +408,7 @@ function addChild(graph, cell)
 	{
 		model.endUpdate();
 	}
-	
+
 	return vertex;
 };
 
@@ -418,7 +419,7 @@ function deleteSubtree(graph, cell)
 	graph.traverse(cell, true, function(vertex)
 	{
 		cells.push(vertex);
-		
+
 		return true;
 	});
 
@@ -434,6 +435,6 @@ function deleteSubtree(graph, cell)
 	<div id="outlineContainer"
 		style="z-index:1;position:absolute;overflow:hidden;top:0px;right:0px;width:160px;height:120px;background:transparent;border-style:solid;border-color:lightgray;">
 	</div>
-	
+
 </body>
 </html>

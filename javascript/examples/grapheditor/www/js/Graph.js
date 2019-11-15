@@ -2839,13 +2839,11 @@ Graph.prototype.resizeParentStacks = function(parent, layout, dx, dy)
  */
 Graph.prototype.isContainer = function(cell)
 {
-
 	var state = this.view.getState(cell);
 	var style = (state != null) ? state.style : this.getCellStyle(cell);
 	
 	if (this.isSwimlane(cell))
 	{
-		console.log("swimlane99");
 		return style['container'] != '0';
 	}
 	else

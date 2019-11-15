@@ -461,7 +461,7 @@ Editor.prototype.readGraphState = function(node)
 	
 	this.graph.pageBreaksVisible = this.graph.pageVisible; 
 	this.graph.preferPageSize = this.graph.pageBreaksVisible;
-
+	
 	var pw = parseFloat(node.getAttribute('pageWidth'));
 	var ph = parseFloat(node.getAttribute('pageHeight'));
 	
@@ -1729,7 +1729,7 @@ PageSetupDialog.addPageFormatPanel = function(div, namePostfix, pageFormat, page
 							pageFormat.height = 583;
 						}
 					}
-
+					
 					if (pageFormat.width == f.format.width && pageFormat.height == f.format.height)
 					{
 						paperSizeSelect.value = f.key;
@@ -1863,8 +1863,7 @@ PageSetupDialog.addPageFormatPanel = function(div, namePostfix, pageFormat, page
 		customSize = paperSizeSelect.value == 'custom';
 		update(evt, true);
 	});
-
-	paperSizeSelect.value = 'a0';
+	
 	update();
 	
 	return {set: function(value)

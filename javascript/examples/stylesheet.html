@@ -1,6 +1,6 @@
 <!--
   Copyright (c) 2006-2013, JGraph Ltd
-  
+
   Stylesheet example for mxGraph. This example demonstrates using
   a custom stylesheet and control points in edges, as well as
   overriding the getLabel and getTooltip function to return
@@ -37,16 +37,16 @@
 			{
 				// Creates the graph inside the DOM node.
 				var graph = new mxGraph(container);
-			
+
 				// Disables basic selection and cell handling
 				graph.setEnabled(false);
-				
+
 				// Returns a special label for edges. Note: This does
 				// a supercall to use the default implementation.
 				graph.getLabel = function(state)
 				{
 					var label = mxGraph.prototype.getLabel.apply(this, arguments);
-					
+
 					if (this.getModel().isEdge(state.cell))
 					{
 						return 'Transfer '+label;
@@ -56,19 +56,19 @@
 						return label;
 					}
 				};
-								
+
 				// Installs a custom global tooltip
 				graph.setTooltips(true);
 				graph.getTooltip = function(state)
 				{
 					var cell = state.cell;
 					var model = this.getModel();
-					
+
 					if (model.isEdge(cell))
 					{
 						var source = this.getLabel(model.getTerminal(cell, true));
 						var target = this.getLabel(model.getTerminal(cell, false));
-						
+
 						return source+' -> '+target;
 					}
 					else
@@ -76,14 +76,14 @@
 						return this.getLabel(cell);
 					}
 				};
-				
+
 				// Creates the default style for vertices
 				var style = [];
 				style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;
 				style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
 				style[mxConstants.STYLE_STROKECOLOR] = 'gray';
 				style[mxConstants.STYLE_ROUNDED] = true;
-				style[mxConstants.STYLE_FILLCOLOR] = '#EEEEEE';
+				// style[mxConstants.STYLE_FILLCOLOR] = '#EEEEEE';
 				style[mxConstants.STYLE_GRADIENTCOLOR] = 'white';
 				style[mxConstants.STYLE_FONTCOLOR] = '#774400';
 				style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
@@ -91,7 +91,7 @@
 				style[mxConstants.STYLE_FONTSIZE] = '12';
 				style[mxConstants.STYLE_FONTSTYLE] = 1;
 				graph.getStylesheet().putDefaultVertexStyle(style);
-		
+
 				// Creates the default style for edges
 				style = [];
 				style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_CONNECTOR;
@@ -106,7 +106,7 @@
 				// Gets the default parent for inserting new cells. This
 				// is normally the first child of the root (ie. layer 0).
 				var parent = graph.getDefaultParent();
-								
+
 				// Adds cells to the model in a single step
 				graph.getModel().beginUpdate();
 				try
@@ -139,7 +139,7 @@
 
 <!-- Page passes the container for the graph to the program -->
 <body onload="main(document.getElementById('graphContainer'))">
- 
+
 	<!-- Creates a container for the graph with a grid wallpaper -->
 	<div id="graphContainer"
 		style="overflow:hidden;position:relative;width:621px;height:311px;cursor:default;">

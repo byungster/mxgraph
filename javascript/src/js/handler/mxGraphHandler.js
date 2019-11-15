@@ -790,7 +790,7 @@ mxGraphHandler.prototype.mouseMove = function(sender, me)
 			    if (this.target != target)
 			    {
 				    this.target = target;
-				    // this.setHighlightColor(mxConstants.DROP_TARGET_COLOR);
+				    this.setHighlightColor(mxConstants.DROP_TARGET_COLOR);
 				}
 			    
 			    highlight = true;
@@ -810,7 +810,7 @@ mxGraphHandler.prototype.mouseMove = function(sender, me)
 						var color = (error == null) ?
 							mxConstants.VALID_COLOR :
 							mxConstants.INVALID_CONNECT_TARGET_COLOR;
-						// this.setHighlightColor(color);
+						this.setHighlightColor(color);
 						highlight = true;
 					}
 				}
@@ -818,7 +818,7 @@ mxGraphHandler.prototype.mouseMove = function(sender, me)
 			
 			if (state != null && highlight)
 			{
-				this.highlight.highlight(state); // 이거다...
+				this.highlight.highlight(state);
 			}
 			else
 			{

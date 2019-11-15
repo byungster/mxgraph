@@ -171,17 +171,6 @@ Toolbar.prototype.init = function()
 
 	var insertMenu = this.addMenu('', mxResources.get('insert') + ' (' + mxResources.get('doubleClickTooltip') + ')', true, 'insert', null, true);
 	this.addDropDownArrow(insertMenu, 'geSprite-plus', 38, 48, -4, -3, 36, -8);
-
-	// var elt = this.addItems(['cellSort']);
-	// elts[0].setAttribute('title', mxResources.get('cellSort') + ' (' + this.editorUi.actions.get('zoomIn').shortcut + ')');
-
-	var elt = this.addItems(['cellSortVertical']);
-	elts[0].setAttribute('title', mxResources.get('cellSortVertical') + ' (' + this.editorUi.actions.get('zoomIn').shortcut + ')');
-
-	var elt = this.addItems(['cellSortHorizontal']);
-	elts[0].setAttribute('title', mxResources.get('cellSortHorizontal') + ' (' + this.editorUi.actions.get('zoomIn').shortcut + ')');
-
-
 };
 
 /**
@@ -749,7 +738,6 @@ Toolbar.prototype.addItems = function(keys, c, ignoreDisabled)
 Toolbar.prototype.addItem = function(sprite, key, c, ignoreDisabled)
 {
 	var action = this.editorUi.actions.get(key);
-
 	var elt = null;
 	
 	if (action != null)
@@ -766,6 +754,7 @@ Toolbar.prototype.addItem = function(sprite, key, c, ignoreDisabled)
 		if (!ignoreDisabled)
 		{
 			elt.setEnabled(action.enabled);
+			
 			action.addListener('stateChanged', function()
 			{
 				elt.setEnabled(action.enabled);
@@ -815,6 +804,7 @@ Toolbar.prototype.addEnabledState = function(elt)
 	elt.setEnabled = function(value)
 	{
 		elt.enabled = value;
+		
 		if (value)
 		{
 			elt.className = classname;
